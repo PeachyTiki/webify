@@ -156,27 +156,57 @@ async function convertImage(
   inputPath: string,
   outputPath: string,
   opts: ConvJob['options']
-): Promise<void> {
+): Promise<{ pages: number }> {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sharp = require('sharp')
-  // sharp also needs the asar-unpacked path for its native bindings when packaged
-  let img = sharp(inputPath, { animated: true })
-  const meta = await img.metadata()
+
+  // Step 1: read metadata on a DEDICATED animated-mode instance.
+  // In sharp ≥ 0.32, calling metadata() finalises the internal pipeline
+  // state — reusing that same instance for encoding then re-opens the file
+  // without the constructor options, silently dropping { animated: true }
+  // and collapsing every frame after the first.  We use a short-lived
+  // instance here so the encoding pipeline below starts completely fresh.
+  const meta = await sharp(inputPath, { animated: true }).metadata()
+  const srcPages = meta.pages ?? 1
+  console.log(`[convert] ${path.basename(inputPath)} pages=${srcPages} loop=${meta.loop ?? 0}`)
+
+  // Step 2: build the encode pipeline on a FRESH animated-mode instance.
+  // { animated: true } is mandatory — omitting it collapses all frames to
+  // frame 1 regardless of what the source contains (GIF, animated WebP, APNG).
+  let pipeline = sharp(inputPath, { animated: true })
 
   if (opts.maxWidth && meta.width && meta.width > opts.maxWidth) {
-    img = img.resize({ width: opts.maxWidth })
+    // resize() on an animated pipeline scales every frame; aspect is kept
+    // automatically via width-only constraint.
+    pipeline = pipeline.resize({ width: opts.maxWidth })
   }
-  if (opts.keepMetadata) img = img.withMetadata()
+  if (opts.keepMetadata) pipeline = pipeline.withMetadata()
 
-  await img
+  await pipeline
     .webp({
       quality: opts.quality,
       lossless: opts.lossless,
       nearLossless: opts.nearLossless,
       effort: 6,
       loop: meta.loop ?? 0,
+      // Forward per-frame delays explicitly so libvips writes them into the
+      // animated WebP container even when the source format carries them
+      // differently (e.g. GIF centiseconds vs WebP milliseconds).
+      ...(meta.delay ? { delay: meta.delay } : {}),
     })
     .toFile(outputPath)
+
+  // Step 3: verify the output actually contains all frames.
+  const outMeta = await sharp(outputPath, { animated: true }).metadata()
+  const outPages = outMeta.pages ?? 1
+  console.log(`[verify] ${path.basename(outputPath)} pages=${outPages}`)
+  if (srcPages > 1 && outPages === 1) {
+    throw new Error(
+      `Animated encode failed: source had ${srcPages} frames but output has 1 (pages=${outPages})`
+    )
+  }
+
+  return { pages: outPages }
 }
 
 async function convertVideo(
@@ -243,18 +273,12 @@ export async function convertBatch(
           larger: outBytes > inBytes,
         }
       } else {
-        // Try image first; if it's actually animated, sharp handles it
-        await convertImage(inputPath, outputPath, opts)
+        const { pages } = await convertImage(inputPath, outputPath, opts)
         const outBytes = fs.statSync(outputPath).size
-        // Determine if it was animated by checking if output is > 1 frame
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const sharp = require('sharp')
-        const outMeta = await sharp(outputPath, { animated: true }).metadata()
-        const kind = outMeta.pages && outMeta.pages > 1 ? 'animated' : 'static'
         result = {
           input: inputPath,
           output: outputPath,
-          kind,
+          kind: pages > 1 ? 'animated' : 'static',
           inBytes,
           outBytes,
           larger: outBytes > inBytes,
