@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & package macOS DMG
+        run: npm run dist:mac
+        env:
+          # Disable code-signing for unsigned personal builds
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload DMG to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.dmg
+          fail_on_unmatched_files: true
+
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & package Windows installer
+        run: npm run dist:win
+
+      - name: Upload EXE to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.exe
+          fail_on_unmatched_files: true
