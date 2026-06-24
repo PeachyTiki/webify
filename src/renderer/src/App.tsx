@@ -105,7 +105,7 @@ export default function App(): React.JSX.Element {
 
   return (
     <div className={styles.app}>
-      <Header videoAvailable={videoAvailable} />
+      <Header />
 
       <div className={styles.scroll}>
         {phase !== 'done' && (
