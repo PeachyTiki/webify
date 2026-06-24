@@ -32,6 +32,7 @@
   "build": {
     "appId": "com.monteo.webpconverter",
     "productName": "WebP Converter",
+    "npmRebuild": false,
     "files": [
       "dist/**",
       "dist-electron/**"
