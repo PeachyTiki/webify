@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import type { ConvOptions, ConversionResult, FileEntry } from '../../shared/types'
+import type { ConvOptions, ConversionResult, FileEntry, OutputMode } from '../../shared/types'
 import { DEFAULT_OPTIONS } from '../../shared/types'
 import styles from './App.module.css'
 import Header from './components/Header'
@@ -17,6 +17,8 @@ export default function App(): React.JSX.Element {
   const [perFileOpts, setPerFileOpts] = useState<Map<string, Partial<ConvOptions>>>(new Map())
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [recursive, setRecursive] = useState(true)
+  const [outputMode, setOutputMode] = useState<OutputMode>('downloads')
+  const [customOutputDir, setCustomOutputDir] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
   const [results, setResults] = useState<ConversionResult[]>([])
   const [outDir, setOutDir] = useState('')
@@ -71,6 +73,11 @@ export default function App(): React.JSX.Element {
     setPhase('idle')
   }
 
+  const handleChooseOutputDir = async () => {
+    const dir = await window.api.chooseOutputDir()
+    if (dir) setCustomOutputDir(dir)
+  }
+
   const handleConvert = async () => {
     if (!files.length) return
     setPhase('converting')
@@ -89,7 +96,7 @@ export default function App(): React.JSX.Element {
     unsubscribeRef.current = unsub
 
     try {
-      const response = await window.api.convert(jobs)
+      const response = await window.api.convert(jobs, outputMode, customOutputDir || undefined)
       setOutDir(response.outDir)
     } finally {
       unsub()
@@ -128,6 +135,10 @@ export default function App(): React.JSX.Element {
                 <GlobalOptions
                   opts={globalOpts}
                   onChange={setGlobalOpts}
+                  outputMode={outputMode}
+                  customOutputDir={customOutputDir}
+                  onOutputModeChange={setOutputMode}
+                  onChooseOutputDir={handleChooseOutputDir}
                   showAdvanced={showAdvanced}
                   onToggleAdvanced={() => setShowAdvanced((v) => !v)}
                 />

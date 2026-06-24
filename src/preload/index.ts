@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { ConvJob, ConversionResult, ConvertResponse, FileEntry } from '../shared/types'
+import type { ConvJob, ConversionResult, ConvertResponse, FileEntry, OutputMode } from '../shared/types'
 
 const api = {
   chooseFiles: (): Promise<FileEntry[]> =>
@@ -11,8 +11,11 @@ const api = {
   probe: (paths: string[]): Promise<FileEntry[]> =>
     ipcRenderer.invoke('probe', paths),
 
-  convert: (jobs: ConvJob[]): Promise<ConvertResponse> =>
-    ipcRenderer.invoke('convert', jobs),
+  chooseOutputDir: (): Promise<string | null> =>
+    ipcRenderer.invoke('choose-output-dir'),
+
+  convert: (jobs: ConvJob[], outputMode: OutputMode, customDir?: string): Promise<ConvertResponse> =>
+    ipcRenderer.invoke('convert', jobs, outputMode, customDir),
 
   openPath: (p: string): Promise<void> =>
     ipcRenderer.invoke('open-path', p),

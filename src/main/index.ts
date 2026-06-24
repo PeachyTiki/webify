@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { initFfmpeg, probeFiles, convertBatch, VIDEO_EXTS, IMAGE_EXTS } from './converter'
-import type { ConvJob, ConversionResult } from '../shared/types'
+import type { ConvJob, ConversionResult, OutputMode } from '../shared/types'
 
 let mainWindow: BrowserWindow | null = null
 let _videoAvailable = false
@@ -100,18 +100,35 @@ ipcMain.handle('probe', async (_e, paths: string[]) => {
   return probeFiles(paths)
 })
 
-ipcMain.handle('convert', async (event, jobs: ConvJob[]) => {
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-  const outDir = path.join(app.getPath('downloads'), `webp_${stamp}`)
+ipcMain.handle('choose-output-dir', async () => {
+  if (!mainWindow) return null
+  const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    title: 'Choose Output Folder',
+    properties: ['openDirectory', 'createDirectory'],
+  })
+  return canceled || !filePaths.length ? null : filePaths[0]
+})
+
+ipcMain.handle('convert', async (event, jobs: ConvJob[], outputMode: OutputMode = 'downloads', customDir?: string) => {
+  let outDir: string | null
+  if (outputMode === 'same') {
+    outDir = null
+  } else if (outputMode === 'custom' && customDir) {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    outDir = path.join(customDir, `webp_${stamp}`)
+  } else {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    outDir = path.join(app.getPath('downloads'), `webp_${stamp}`)
+  }
 
   const results = await convertBatch(jobs, outDir, (result: ConversionResult) => {
     event.sender.send('convert:progress', result)
   })
 
-  // Auto-open output folder when done
-  shell.openPath(outDir)
+  const openDir = outDir ?? (results[0]?.output ? path.dirname(results[0].output) : null)
+  if (openDir) shell.openPath(openDir)
 
-  return { outDir, results }
+  return { outDir: openDir ?? '', results }
 })
 
 ipcMain.handle('open-path', (_e, p: string) => {

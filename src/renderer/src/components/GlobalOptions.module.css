@@ -46,6 +46,70 @@
   line-height: 1.5;
 }
 
+.segmentGroup {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmentBtn {
+  background: transparent;
+  color: var(--text2);
+  border: none;
+  border-right: 1px solid var(--border);
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.segmentBtn:last-child {
+  border-right: none;
+}
+.segmentBtn:hover {
+  background: var(--bg3, #2a2a2a);
+  color: var(--text);
+}
+.segmentActive {
+  background: var(--accent);
+  color: #fff;
+}
+.segmentActive:hover {
+  background: var(--accent-hover, var(--accent));
+  color: #fff;
+}
+
+.customDirRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.customDirPath {
+  font-size: 12px;
+  color: var(--text2);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browseBtn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.browseBtn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 .advancedBtn {
   background: transparent;
   color: var(--accent);

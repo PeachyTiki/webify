@@ -1,3 +1,5 @@
+export type OutputMode = 'same' | 'downloads' | 'custom'
+
 export type ConvOptions = {
   quality: number        // 1..100, default 90
   lossless: boolean      // default false

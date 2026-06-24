@@ -147,9 +147,10 @@ export async function probeFiles(filePaths: string[]): Promise<FileEntry[]> {
   return Promise.all(filePaths.map(classifyPath))
 }
 
-function buildOutputPath(outDir: string, inputPath: string): string {
+function buildOutputPath(inputPath: string, outDir: string | null): string {
+  const dir = outDir ?? path.dirname(inputPath)
   const base = path.basename(inputPath, path.extname(inputPath))
-  return path.join(outDir, `${base}.webp`)
+  return path.join(dir, `${base}.webp`)
 }
 
 async function convertImage(
@@ -244,16 +245,16 @@ async function convertVideo(
 
 export async function convertBatch(
   jobs: ConvJob[],
-  outDir: string,
+  outDir: string | null,
   onProgress: (result: ConversionResult) => void
 ): Promise<ConversionResult[]> {
-  fs.mkdirSync(outDir, { recursive: true })
+  if (outDir) fs.mkdirSync(outDir, { recursive: true })
   const results: ConversionResult[] = []
 
   for (const job of jobs) {
     const { path: inputPath, options: opts } = job
     const inBytes = (() => { try { return fs.statSync(inputPath).size } catch { return 0 } })()
-    const outputPath = buildOutputPath(outDir, inputPath)
+    const outputPath = buildOutputPath(inputPath, outDir)
 
     let result: ConversionResult
 
