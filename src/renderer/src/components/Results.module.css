@@ -1,0 +1,123 @@
+.wrap {
+  margin-top: 20px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.heading {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.openBtn {
+  background: var(--bg3);
+  color: var(--accent);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+.openBtn:hover {
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.row.bad {
+  opacity: 0.55;
+}
+
+.name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.kind {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
+}
+.kind_static { background: rgba(74,158,255,0.12); color: var(--accent); }
+.kind_animated { background: rgba(224,179,82,0.12); color: var(--yellow); }
+.kind_video { background: rgba(61,186,93,0.12); color: var(--green); }
+.kind_skipped, .kind_failed { background: rgba(160,160,160,0.1); color: var(--text2); }
+
+.sizes {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text2);
+}
+
+.pctGreen { color: var(--green); }
+.pctRed { color: var(--red); }
+
+.largerBadge {
+  flex-shrink: 0;
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.error {
+  color: var(--red);
+  font-size: 11px;
+  flex: 1;
+}
+
+.summary {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.tip {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text2);
+  font-style: italic;
+}
+
+.anotherBtn {
+  margin-top: 16px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.anotherBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

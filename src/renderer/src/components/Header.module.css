@@ -1,0 +1,37 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.on {
+  background: rgba(61, 186, 93, 0.18);
+  color: var(--green);
+  border: 1px solid rgba(61, 186, 93, 0.3);
+}
+
+.off {
+  background: rgba(160, 160, 160, 0.1);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}

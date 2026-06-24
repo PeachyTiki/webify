@@ -1,0 +1,63 @@
+.panel {
+  margin-top: 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.label {
+  width: 72px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.slider {
+  flex: 1;
+  max-width: 260px;
+}
+
+.sliderVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  width: 28px;
+}
+
+.note {
+  font-size: 11px;
+  color: var(--text2);
+  margin: 4px 0 14px;
+  line-height: 1.5;
+}
+
+.advancedBtn {
+  background: transparent;
+  color: var(--accent);
+  padding: 6px 0;
+  font-size: 12px;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.advancedBtn:hover {
+  color: var(--accent-hover);
+}
+.advancedBtn.open {
+  color: var(--text2);
+}
