@@ -34,9 +34,7 @@
     "productName": "WebP Converter",
     "files": [
       "dist/**",
-      "dist-electron/**",
-      "node_modules/**",
-      "package.json"
+      "dist-electron/**"
     ],
     "asarUnpack": [
       "**/node_modules/sharp/**",
