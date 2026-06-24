@@ -1,26 +1,24 @@
 import React from 'react'
-import type { ConvOptions, OutputMode } from '../../../shared/types'
+import type { ConvOptions } from '../../../shared/types'
+import type { Strings } from '../i18n'
 import styles from './GlobalOptions.module.css'
 
 interface Props {
   opts: ConvOptions
   onChange: (opts: ConvOptions) => void
-  outputMode: OutputMode
-  customOutputDir: string
-  onOutputModeChange: (mode: OutputMode) => void
-  onChooseOutputDir: () => void
   showAdvanced: boolean
   onToggleAdvanced: () => void
+  t: Strings
 }
 
-export default function GlobalOptions({ opts, onChange, outputMode, customOutputDir, onOutputModeChange, onChooseOutputDir, showAdvanced, onToggleAdvanced }: Props): React.JSX.Element {
+export default function GlobalOptions({ opts, onChange, showAdvanced, onToggleAdvanced, t }: Props): React.JSX.Element {
   const set = <K extends keyof ConvOptions>(key: K, value: ConvOptions[K]) =>
     onChange({ ...opts, [key]: value })
 
   return (
     <div className={styles.panel}>
       <div className={styles.row}>
-        <label className={styles.label}>Quality</label>
+        <label className={styles.label}>{t.quality}</label>
         <div className={styles.sliderRow}>
           <input
             type="range"
@@ -35,7 +33,7 @@ export default function GlobalOptions({ opts, onChange, outputMode, customOutput
       </div>
 
       <div className={styles.row}>
-        <label className={styles.label}>Lossless</label>
+        <label className={styles.label}>{t.lossless}</label>
         <input
           type="checkbox"
           checked={opts.lossless}
@@ -43,44 +41,13 @@ export default function GlobalOptions({ opts, onChange, outputMode, customOutput
         />
       </div>
 
-      <div className={styles.row}>
-        <label className={styles.label}>Output</label>
-        <div className={styles.segmentGroup}>
-          {(['same', 'downloads', 'custom'] as OutputMode[]).map((mode) => (
-            <button
-              key={mode}
-              className={`${styles.segmentBtn} ${outputMode === mode ? styles.segmentActive : ''}`}
-              onClick={() => onOutputModeChange(mode)}
-            >
-              {mode === 'same' ? 'Same Folder' : mode === 'downloads' ? 'Downloads' : 'Custom…'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {outputMode === 'custom' && (
-        <div className={styles.row}>
-          <label className={styles.label} />
-          <div className={styles.customDirRow}>
-            <span className={styles.customDirPath} title={customOutputDir}>
-              {customOutputDir || 'No folder chosen'}
-            </span>
-            <button className={styles.browseBtn} onClick={onChooseOutputDir}>
-              Browse…
-            </button>
-          </div>
-        </div>
-      )}
-
-      <p className={styles.note}>
-        Audio is always removed from video. Length, frame rate, and looping are preserved.
-      </p>
+      <p className={styles.note}>{t.advancedNote}</p>
 
       <button
         className={`${styles.advancedBtn} ${showAdvanced ? styles.open : ''}`}
         onClick={onToggleAdvanced}
       >
-        {showAdvanced ? 'Hide Advanced' : 'Advanced (per-file overrides)'}
+        {showAdvanced ? t.hideAdvanced : t.showAdvanced}
       </button>
     </div>
   )

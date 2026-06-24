@@ -1,5 +1,6 @@
 import React from 'react'
 import type { ConvOptions, FileEntry } from '../../../shared/types'
+import type { Strings } from '../i18n'
 import styles from './AdvancedTable.module.css'
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   perFileOpts: Map<string, Partial<ConvOptions>>
   onPerFileChange: (m: Map<string, Partial<ConvOptions>>) => void
   onRemove: (path: string) => void
+  t: Strings
 }
 
 function fmt(bytes: number): string {
@@ -26,21 +28,13 @@ function kindLabel(k: FileEntry['kind']): string {
 }
 
 export default function AdvancedTable({
-  files, globalOpts, perFileOpts, onPerFileChange, onRemove,
+  files, globalOpts, perFileOpts, onPerFileChange, onRemove, t,
 }: Props): React.JSX.Element {
 
-  const setField = <K extends keyof ConvOptions>(
-    path: string,
-    key: K,
-    value: ConvOptions[K] | undefined
-  ) => {
+  const setField = <K extends keyof ConvOptions>(path: string, key: K, value: ConvOptions[K] | undefined) => {
     const next = new Map(perFileOpts)
     const cur = { ...(next.get(path) ?? {}) }
-    if (value === undefined) {
-      delete cur[key]
-    } else {
-      cur[key] = value
-    }
+    if (value === undefined) { delete cur[key] } else { cur[key] = value }
     if (Object.keys(cur).length === 0) next.delete(path)
     else next.set(path, cur)
     onPerFileChange(next)
@@ -54,21 +48,21 @@ export default function AdvancedTable({
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.hint}>Per-file overrides — blank fields inherit global settings.</p>
+      <p className={styles.hint}>{t.advancedHint}</p>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>File</th>
-              <th>Kind</th>
-              <th>Size</th>
-              <th>Quality</th>
-              <th>Lossless</th>
-              <th>Near-lossless</th>
-              <th>FPS cap</th>
-              <th>Max width</th>
-              <th>Keep meta</th>
-              <th></th>
+              <th>{t.file}</th>
+              <th>{t.kind}</th>
+              <th>{t.size}</th>
+              <th>{t.quality}</th>
+              <th>{t.lossless}</th>
+              <th>{t.nearLossless}</th>
+              <th>{t.fpsCap}</th>
+              <th>{t.maxWidth}</th>
+              <th>{t.keepMeta}</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -82,66 +76,53 @@ export default function AdvancedTable({
               return (
                 <tr key={f.path} className={hasOverride ? styles.overridden : ''}>
                   <td className={styles.name} title={f.path}>{f.name}</td>
-                  <td><span className={`${styles.badge} ${styles[`badge_${f.kind.replace('-', '_')}`]}`}>{kindLabel(f.kind)}</span></td>
+                  <td>
+                    <span className={`${styles.badge} ${styles[`badge_${f.kind.replace('-', '_')}`]}`}>
+                      {kindLabel(f.kind)}
+                    </span>
+                  </td>
                   <td className={styles.mono}>{fmt(f.bytes)}</td>
 
-                  {/* Quality */}
                   <td>
                     <input
-                      type="number"
-                      min={1} max={100}
-                      value={effQ}
+                      type="number" min={1} max={100} value={effQ}
                       onChange={(e) => setField(f.path, 'quality', e.target.value ? Number(e.target.value) : undefined)}
                     />
                   </td>
 
-                  {/* Lossless */}
                   <td className={styles.center}>
-                    <input
-                      type="checkbox"
-                      checked={effL}
+                    <input type="checkbox" checked={effL}
                       onChange={(e) => setField(f.path, 'lossless', e.target.checked)}
                     />
                   </td>
 
-                  {/* Near-lossless (images only) */}
                   <td className={styles.center}>
                     {f.kind !== 'video' ? (
-                      <input
-                        type="checkbox"
-                        checked={effNL}
+                      <input type="checkbox" checked={effNL}
                         onChange={(e) => setField(f.path, 'nearLossless', e.target.checked)}
                       />
                     ) : <span className={styles.na}>—</span>}
                   </td>
 
-                  {/* FPS cap */}
                   <td>
                     <input
-                      type="number"
-                      min={1} max={240}
-                      placeholder="—"
+                      type="number" min={1} max={240} placeholder="—"
                       value={overrides.fpsCap ?? ''}
                       onChange={(e) => setField(f.path, 'fpsCap', e.target.value ? Number(e.target.value) : null)}
                     />
                   </td>
 
-                  {/* Max width */}
                   <td>
                     <input
-                      type="number"
-                      min={1}
-                      placeholder="—"
+                      type="number" min={1} placeholder="—"
                       value={overrides.maxWidth ?? ''}
                       onChange={(e) => setField(f.path, 'maxWidth', e.target.value ? Number(e.target.value) : null)}
                     />
                   </td>
 
-                  {/* Keep metadata */}
                   <td className={styles.center}>
                     {f.kind !== 'video' ? (
-                      <input
-                        type="checkbox"
+                      <input type="checkbox"
                         checked={overrides.keepMetadata ?? globalOpts.keepMetadata}
                         onChange={(e) => setField(f.path, 'keepMetadata', e.target.checked)}
                       />
@@ -154,9 +135,7 @@ export default function AdvancedTable({
                         reset
                       </button>
                     )}
-                    <button className={styles.removeBtn} onClick={() => onRemove(f.path)} title="Remove file">
-                      ×
-                    </button>
+                    <button className={styles.removeBtn} onClick={() => onRemove(f.path)} title="Remove">×</button>
                   </td>
                 </tr>
               )

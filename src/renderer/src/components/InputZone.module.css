@@ -3,39 +3,52 @@
 }
 
 .dropArea {
-  border: 2px dashed var(--border);
+  border: 1.5px dashed var(--border);
   border-radius: var(--radius);
-  padding: 28px 24px;
+  padding: 36px 24px 28px;
   text-align: center;
   transition: border-color 0.15s, background 0.15s;
   background: var(--bg2);
 }
-
 .dropArea.dragging {
   border-color: var(--accent);
-  background: rgba(74, 158, 255, 0.07);
+  background: var(--accent-dim);
+}
+
+.iconWrap {
+  color: var(--text2);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  opacity: 0.6;
+}
+.dragging .iconWrap {
+  color: var(--accent);
+  opacity: 1;
 }
 
 .dropLabel {
   color: var(--text2);
   font-size: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  font-weight: 500;
 }
 
 .buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .btn {
   background: var(--bg3);
   color: var(--text);
-  padding: 9px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   font-size: 13px;
+  font-weight: 500;
 }
 .btn:hover {
   border-color: var(--accent);
@@ -51,13 +64,14 @@
   cursor: pointer;
   user-select: none;
 }
+.recursive:hover { color: var(--text); }
 
 .summary {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 13px;
-  color: var(--text2);
+  color: var(--text);
   padding: 0 2px;
 }
-.summary strong {
-  color: var(--text);
+.summaryDetail {
+  color: var(--text2);
 }

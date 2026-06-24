@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import type { ConvOptions, ConversionResult, FileEntry, OutputMode } from '../../shared/types'
 import { DEFAULT_OPTIONS } from '../../shared/types'
+import type { Lang } from './i18n'
+import { getStrings } from './i18n'
 import styles from './App.module.css'
 import Header from './components/Header'
+import SettingsPanel from './components/SettingsPanel'
 import InputZone from './components/InputZone'
 import GlobalOptions from './components/GlobalOptions'
 import AdvancedTable from './components/AdvancedTable'
@@ -10,19 +13,41 @@ import Results from './components/Results'
 
 type Phase = 'idle' | 'converting' | 'done'
 
+function load<T>(key: string, fallback: T): T {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) as T : fallback } catch { return fallback }
+}
+function save<T>(key: string, value: T) {
+  try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
+}
+
 export default function App(): React.JSX.Element {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => load('theme', 'dark'))
+  const [lang, setLang] = useState<Lang>(() => load('lang', 'en'))
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [outputMode, setOutputMode] = useState<OutputMode>(() => load('outputMode', 'downloads'))
+  const [customOutputDir, setCustomOutputDir] = useState<string>(() => load('customOutputDir', ''))
+
   const [videoAvailable, setVideoAvailable] = useState(false)
   const [files, setFiles] = useState<FileEntry[]>([])
   const [globalOpts, setGlobalOpts] = useState<ConvOptions>(DEFAULT_OPTIONS)
   const [perFileOpts, setPerFileOpts] = useState<Map<string, Partial<ConvOptions>>>(new Map())
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [recursive, setRecursive] = useState(true)
-  const [outputMode, setOutputMode] = useState<OutputMode>('downloads')
-  const [customOutputDir, setCustomOutputDir] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
   const [results, setResults] = useState<ConversionResult[]>([])
   const [outDir, setOutDir] = useState('')
   const unsubscribeRef = useRef<(() => void) | null>(null)
+
+  const t = getStrings(lang)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    save('theme', theme)
+  }, [theme])
+
+  useEffect(() => { save('lang', lang) }, [lang])
+  useEffect(() => { save('outputMode', outputMode) }, [outputMode])
+  useEffect(() => { save('customOutputDir', customOutputDir) }, [customOutputDir])
 
   useEffect(() => {
     const unsub = window.api.onVideoStatus(setVideoAvailable)
@@ -36,8 +61,7 @@ export default function App(): React.JSX.Element {
   const addFiles = useCallback((entries: FileEntry[]) => {
     setFiles((prev) => {
       const existing = new Set(prev.map((f) => f.path))
-      const fresh = entries.filter((e) => !existing.has(e.path))
-      return [...prev, ...fresh]
+      return [...prev, ...entries.filter((e) => !existing.has(e.path))]
     })
   }, [])
 
@@ -58,11 +82,7 @@ export default function App(): React.JSX.Element {
 
   const handleRemoveFile = (filePath: string) => {
     setFiles((prev) => prev.filter((f) => f.path !== filePath))
-    setPerFileOpts((prev) => {
-      const next = new Map(prev)
-      next.delete(filePath)
-      return next
-    })
+    setPerFileOpts((prev) => { const next = new Map(prev); next.delete(filePath); return next })
   }
 
   const handleClear = () => {
@@ -112,7 +132,25 @@ export default function App(): React.JSX.Element {
 
   return (
     <div className={styles.app}>
-      <Header />
+      <Header
+        theme={theme}
+        onToggleTheme={() => setTheme((v) => v === 'dark' ? 'light' : 'dark')}
+        settingsOpen={settingsOpen}
+        onToggleSettings={() => setSettingsOpen((v) => !v)}
+        t={t}
+      />
+
+      {settingsOpen && (
+        <SettingsPanel
+          outputMode={outputMode}
+          customOutputDir={customOutputDir}
+          onOutputModeChange={setOutputMode}
+          onChooseOutputDir={handleChooseOutputDir}
+          lang={lang}
+          onLangChange={setLang}
+          t={t}
+        />
+      )}
 
       <div className={styles.scroll}>
         {phase !== 'done' && (
@@ -128,6 +166,7 @@ export default function App(): React.JSX.Element {
               animatedCount={animatedCount}
               videoCount={videoCount}
               unknownCount={unknownCount}
+              t={t}
             />
 
             {files.length > 0 && (
@@ -135,12 +174,9 @@ export default function App(): React.JSX.Element {
                 <GlobalOptions
                   opts={globalOpts}
                   onChange={setGlobalOpts}
-                  outputMode={outputMode}
-                  customOutputDir={customOutputDir}
-                  onOutputModeChange={setOutputMode}
-                  onChooseOutputDir={handleChooseOutputDir}
                   showAdvanced={showAdvanced}
                   onToggleAdvanced={() => setShowAdvanced((v) => !v)}
+                  t={t}
                 />
 
                 {showAdvanced && (
@@ -150,15 +186,22 @@ export default function App(): React.JSX.Element {
                     perFileOpts={perFileOpts}
                     onPerFileChange={setPerFileOpts}
                     onRemove={handleRemoveFile}
+                    t={t}
                   />
                 )}
 
                 <div className={styles.actions}>
-                  <button className={styles.convertBtn} onClick={handleConvert} disabled={phase === 'converting'}>
-                    {phase === 'converting' ? 'Converting…' : `Convert ${files.length} file${files.length !== 1 ? 's' : ''}`}
+                  <button
+                    className={styles.convertBtn}
+                    onClick={handleConvert}
+                    disabled={phase === 'converting'}
+                  >
+                    {phase === 'converting'
+                      ? t.converting
+                      : `${t.convert} ${files.length} ${files.length === 1 ? 'file' : 'files'}`}
                   </button>
                   <button className={styles.clearBtn} onClick={handleClear}>
-                    Clear
+                    {t.clear}
                   </button>
                 </div>
               </>
@@ -173,6 +216,7 @@ export default function App(): React.JSX.Element {
             outDir={outDir}
             done={phase === 'done'}
             onConvertAnother={handleClear}
+            t={t}
           />
         )}
       </div>

@@ -1,17 +1,78 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 20px 14px;
+  justify-content: space-between;
+  padding: 13px 18px 12px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   -webkit-app-region: drag;
+  background: var(--bg2);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoMark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent);
+  flex-shrink: 0;
+  position: relative;
+}
+.logoMark::after {
+  content: 'W';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  line-height: 22px;
+  text-align: center;
 }
 
 .title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text);
   letter-spacing: -0.2px;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.iconBtn {
+  background: transparent;
+  color: var(--text2);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.iconBtn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+.iconBtnActive {
+  background: var(--bg3);
+  color: var(--accent);
+}
+.iconBtnActive:hover {
+  color: var(--accent-hover);
+}

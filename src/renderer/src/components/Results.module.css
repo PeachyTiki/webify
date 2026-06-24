@@ -4,48 +4,57 @@
 
 .topBar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  gap: 12px;
 }
 
 .heading {
   font-size: 15px;
   font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.summary {
+  font-size: 12px;
+  color: var(--text2);
 }
 
 .openBtn {
   background: var(--bg3);
   color: var(--accent);
-  border: 1px solid rgba(74, 158, 255, 0.3);
+  border: 1px solid var(--border);
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
 }
 .openBtn:hover {
-  background: rgba(74, 158, 255, 0.1);
+  border-color: var(--accent);
+  background: var(--accent-dim);
 }
 
 .list {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+  background: var(--bg2);
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border);
   font-size: 12px;
 }
-.row:last-child {
-  border-bottom: none;
-}
-.row.bad {
-  opacity: 0.55;
-}
+.row:last-child { border-bottom: none; }
+.row.bad { opacity: 0.5; }
 
 .name {
   flex: 1;
@@ -53,6 +62,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  color: var(--text);
 }
 
 .kind {
@@ -60,26 +70,28 @@
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 8px;
-  letter-spacing: 0.3px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.4px;
 }
-.kind_static { background: rgba(74,158,255,0.12); color: var(--accent); }
-.kind_animated { background: rgba(224,179,82,0.12); color: var(--yellow); }
-.kind_video { background: rgba(61,186,93,0.12); color: var(--green); }
-.kind_skipped, .kind_failed { background: rgba(160,160,160,0.1); color: var(--text2); }
+.kind_static   { background: rgba(10,132,255,0.12); color: var(--accent); }
+.kind_animated { background: rgba(255,214,10,0.12); color: var(--yellow); }
+.kind_video    { background: rgba(48,209,88,0.12);  color: var(--green); }
+.kind_skipped, .kind_failed { background: rgba(142,142,147,0.1); color: var(--text2); }
 
 .sizes {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .pctGreen { color: var(--green); }
-.pctRed { color: var(--red); }
+.pctRed   { color: var(--red); }
 
 .largerBadge {
-  flex-shrink: 0;
   background: var(--red);
   color: #fff;
   font-size: 9px;
@@ -95,27 +107,23 @@
   flex: 1;
 }
 
-.summary {
-  margin-top: 14px;
-  font-size: 13px;
-  color: var(--text);
-}
-
 .tip {
-  margin-top: 6px;
+  margin-top: 14px;
   font-size: 11px;
   color: var(--text2);
   font-style: italic;
+  line-height: 1.55;
 }
 
 .anotherBtn {
-  margin-top: 16px;
+  margin-top: 14px;
   background: var(--bg3);
   color: var(--text);
   border: 1px solid var(--border);
   padding: 9px 18px;
   border-radius: var(--radius);
   font-size: 13px;
+  font-weight: 500;
 }
 .anotherBtn:hover {
   border-color: var(--accent);
